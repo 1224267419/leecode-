@@ -9459,3 +9459,474 @@ class Solution:
         return p
 ```
 
+#### [剑指 Offer II 025. 链表中的两数相加](https://leetcode.cn/problems/lMSNwu/)
+
+```python
+class Solution:
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+        l1_,l2_=[],[]
+        while l1:
+            l1_.append(l1.val)
+            l1=l1.next
+        while l2:
+            l2_.append(l2.val)
+            l2=l2.next
+        carry=0
+        ans=None
+        while l1_ or l2_ or cur!=0:
+            a=0 if not l1_ else l1_.pop()
+            b=0 if not l2_ else l2_.pop()
+            cur = a + b + carry
+            carry = cur // 10
+            cur %= 10
+            curnode = ListNode(cur)
+            curnode.next = ans
+            ans = curnode
+        return ans
+```
+
+直接用栈装起来，简单好想
+
+```python
+class Solution:
+    def reverseList(self, head: ListNode) -> ListNode:
+        prev = None
+        curr = head
+        while curr:
+            nextTemp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nextTemp
+        return prev
+
+    def addTwoNumbersI(self, l1: ListNode, l2: ListNode) -> ListNode:
+        ans = ListNode(0, None)
+        DUMMY_HEAD, res = ans, 0
+        p1, p2 = l1, l2
+
+        while p1 != None or p2 != None or res == 1:
+            
+            ans.next = ListNode(0, None)
+            ans = ans.next
+
+            if p1 != None and p2 != None:
+                sums = p1.val + p2.val
+                if sums + res < 10:
+                    ans.val = sums + res
+                    res = 0
+                else:
+                    ans.val = sums + res - 10
+                    res = 1
+                p1, p2 = p1.next, p2.next
+            
+            elif p1 == None and p2 != None:
+                sums = p2.val
+                if sums + res < 10:
+                    ans.val = sums + res
+                    res = 0
+                else:
+                    ans.val = sums + res - 10
+                    res = 1
+                p2 = p2.next
+            
+            elif p2 == None and p1 != None:
+                sums = p1.val
+                if sums + res < 10:
+                    ans.val = sums + res
+                    res = 0
+                else:
+                    ans.val = sums + res - 10
+                    res = 1
+                p1 = p1.next
+
+            else:
+                ans.val = res
+                res = 0
+        return DUMMY_HEAD.next
+
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+        return self.reverseList(self.addTwoNumbersI(self.reverseList(l1), self.reverseList(l2)))
+
+```
+
+反转链表再相加再反转,不改原链表
+
+#### [207. 课程表](https://leetcode.cn/problems/course-schedule/) 不会 拓扑结构题 难 典型题,记住做法就好
+
+本题可约化为： 课程安排图是否是 **有向无环图(DAG)**。即课程间规定了前置条件，但**不能构成任何环路**，否则课程前置条件将不成立。
+`请你判断是否可能完成所有课程的学习？`即判断是否有环
+
+##### DFS法
+
+![image-20220525105933870](C:\Users\Administrator\Desktop\leecode\leetcode.assets\image-20220525105933870.png)
+若整个图 DFS 结束并未发现环，返回 True。
+
+
+
+
+
+
+
+#### [剑指 Offer II 026. 重排链表](https://leetcode.cn/problems/LGjMqU/) [143. 重排链表](https://leetcode.cn/problems/reorder-list/) 多练,别到时还用栈做
+
+完美解:找到链表中点,链表反转,链表合并
+
+```python
+class Solution:
+    def reorderList(self, head: ListNode) -> None:
+        if not head:
+            return
+        
+        mid = self.middleNode(head)
+        l1 = head
+        l2 = mid.next
+        mid.next = None
+        l2 = self.reverseList(l2)
+        self.mergeList(l1, l2)
+    
+    def middleNode(self, head: ListNode) -> ListNode:#快慢双指针找中点
+        slow = fast = head
+        while fast.next and fast.next.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
+    
+    def reverseList(self, head: ListNode) -> ListNode:#翻转链表
+        prev = None
+        curr = head
+        while curr:
+            nextTemp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nextTemp
+        return prev
+
+    def mergeList(self, l1: ListNode, l2: ListNode):#合并链表
+        while l1 and l2:
+            l1_tmp = l1.next
+            l2_tmp = l2.next
+
+            l1.next = l2
+            l1 = l1_tmp
+
+            l2.next = l1
+            l2 = l2_tmp
+
+```
+
+时间O(n),空间O(1)
+
+
+
+#### [剑指 Offer II 027. 回文链表](https://leetcode.cn/problems/aMhZSa/) [234. 回文链表](https://leetcode.cn/problems/palindrome-linked-list/) 
+
+肯定就是翻转链表再比较啦,而且因为要比较是否回文,所以可以和上面一样取一半来翻转,节省时间
+
+```python
+class Solution:
+    def  isPalindrome(self, head: ListNode) -> bool:
+        if not head:
+            return
+        
+        mid = self.middleNode(head)
+        l1 = head
+        l2 = mid.next
+        mid.next = None
+        l2 = self.reverseList(l2)
+        while l1 and l2:
+            if l1.val !=l2.val:
+                return False
+            l1=l1.next
+            l2=l2.next
+        return True
+    
+    def middleNode(self, head: ListNode) -> ListNode:#快慢双指针找中点
+        slow = fast = head
+        while fast.next and fast.next.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
+    
+    def reverseList(self, head: ListNode) -> ListNode:#翻转链表
+        prev = None
+        curr = head
+        while curr:
+            nextTemp = curr.next
+            curr.next = prev
+            prev = curr
+            curr = nextTemp
+        return prev
+```
+
+基本思路和上一题一样,都是利用找中点,翻转这两个工具进行
+
+
+
+#### [剑指 Offer II 028. 展平多级双向链表](https://leetcode.cn/problems/Qv1Da2/)  [430. 扁平化多级双向链表](https://leetcode.cn/problems/flatten-a-multilevel-doubly-linked-list/) 双向链表,不会,辅助理解
+
+**评论区神评:斜45°,不就是二叉树嘛,直接先序遍历(根左右)就是了**(记得注意child要=None)
+
+```python
+
+class Solution:
+    def flatten(self, head: 'Node') -> 'Node':
+        curr = head
+        while curr:
+            if curr.child:
+                nex = curr.next
+                child = curr.child
+
+                # 遇到一个child，先在 curr 这里豁开一个口子，把child变成 next 的关系
+                curr.next = child
+                curr.child = None #(和树不一样，记得给child标注None)
+                child.prev = curr
+
+                # 找到当前这个child链的最末尾（树的左节点）
+                while child.next:
+                    child = child.next
+                # 把child的最末尾的节点，跟上面豁开的口子 nex 接上（树的右节点）
+                if nex:
+                    nex.prev = child
+                child.next = nex
+            curr = curr.next
+        return head
+```
+
+
+
+#### [剑指 Offer II 029. 排序的循环链表](https://leetcode.cn/problems/4ueAj6/) [708循环有序列表的插入](https://leetcode-cn.com/problems/insert-into-a-sorted-circular-linked-list/)
+
+```python
+class Solution:
+    def insert(self, head: 'Node', insertVal: int) -> 'Node':
+        if head==None:
+            head = Node(insertVal)
+            head.next = head
+            return head
+        #链表为空的情况
+        cur = head
+        nxt = cur.next
+        while nxt!=head:
+            if cur.val<=insertVal and nxt.val>=insertVal:#中间插入
+                break
+            if cur.val>nxt.val and(insertVal>=cur.val or insertVal<=nxt.val):#两端插入
+                break
+            cur = cur.next
+            nxt = nxt.next
+        xnode = Node(insertVal,nxt)
+        cur.next = xnode
+        return head
+```
+
+
+
+#### [剑指 Offer II 030. 插入、删除和随机访问都是 O(1) 的容器](https://leetcode.cn/problems/FortPu/) 
+
+#### [380. O(1) 时间插入、删除和获取随机元素](https://leetcode.cn/problems/insert-delete-getrandom-o1/)  有点问题，不会，哈希表实现O(1)时间
+
+用哈希表和数组实现O(1)的查找，插入，但是删除还是不大懂
+
+要在O(1)时间内的插入删除，肯定要利用哈希表的
+
+```python
+class RandomizedSet:
+    def __init__(self):
+        self.nums = []
+        self.indices = {}
+
+    def insert(self, val: int) -> bool:
+        if val in self.indices:
+            return False
+        self.indices[val] = len(self.nums)
+        self.nums.append(val)
+        return True
+
+    def remove(self, val: int) -> bool:
+        if val not in self.indices:
+            return False
+        id = self.indices[val]
+        self.nums[id] = self.nums[-1]
+        self.indices[self.nums[id]] = id
+        self.nums.pop()
+        del self.indices[val]
+        return True
+#就是将列表中的val和最后一位元素呼唤，对应哈希表中进行更改，然后pop删除列表中的val，del删除哈希表中的val
+    def getRandom(self) -> int:
+        return choice(self.nums)
+```
+
+
+
+#### [剑指 Offer II 031. 最近最少使用缓存 ](https://leetcode.cn/problems/OrIXps/) [146. LRU 缓存](https://leetcode.cn/problems/lru-cache/) 
+
+
+
+**进阶**：是否可以在 `O(1)` 时间复杂度内完成这两种操作？
+
+```python
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.hashs={}
+        a=[[0,0] for _ in range(capacity)]
+        self.lis=collections.deque(a)
+        self.capacity=capacity
+
+    def get(self, key: int) -> int:
+        if key in self.hashs:
+            return self.lis[self.hashs[key]]
+        else:
+            return -1
+
+    def put(self, key: int, value: int) -> None:
+        n=len(self.hashs)
+        if n == self.capacity:
+            cur=self.lis.popleft()    
+            del self.hashs[cur[0]]
+        self.lis.append([key,value])
+        self.hashs[key]=len(self.lis)
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity)
+# param_1 = obj.get(key)
+# obj.put(key,value)
+```
+
+自己的做法:和上一题一样,用哈希表+双向列表,删除直接左删除
+
+(其实是有问题的,应该像上一题一样和最后元素互换,左删除以后哈希表的元素位置对不上了)
+
+```python
+class LRUCache(collections.OrderedDict):
+
+    def __init__(self, capacity: int):
+        super().__init__()
+        self.capacity = capacity
+
+
+    def get(self, key: int) -> int:
+        if key not in self:
+            return -1
+        self.move_to_end(key)
+        return self[key]
+
+    def put(self, key: int, value: int) -> None:
+        if key in self:
+            self.move_to_end(key)
+        self[key] = value
+        if len(self) > self.capacity:
+            self.popitem(last=False)
+```
+
+答案用了collections.OrderedDict,更简单了
+
+然而题目表示使用内置库不符合标准,强行要用哈希表+自己实现双向链表
+
+```python
+class DLinkedNode:
+    def __init__(self, key=0, value=0):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.cache = dict()
+        # 使用伪头部和伪尾部节点    
+        self.head = DLinkedNode()
+        self.tail = DLinkedNode()
+        self.head.next = self.tail
+        self.tail.prev = self.head
+        self.capacity = capacity
+        self.size = 0
+
+    def get(self, key: int) -> int:
+        if key not in self.cache:
+            return -1
+        # 如果 key 存在，先通过哈希表定位，再移到头部
+        node = self.cache[key]
+        self.moveToHead(node)
+        return node.value
+
+    def put(self, key: int, value: int) -> None:
+        if key not in self.cache:
+            # 如果 key 不存在，创建一个新的节点
+            node = DLinkedNode(key, value)
+            # 添加进哈希表
+            self.cache[key] = node
+            # 添加至双向链表的头部
+            self.addToHead(node)
+            self.size += 1
+            if self.size > self.capacity:
+                # 如果超出容量，删除双向链表的尾部节点
+                removed = self.removeTail()
+                # 删除哈希表中对应的项
+                self.cache.pop(removed.key)
+                self.size -= 1
+        else:
+            # 如果 key 存在，先通过哈希表定位，再修改 value，并移到头部
+            node = self.cache[key]
+            node.value = value
+            self.moveToHead(node)
+    
+    def addToHead(self, node):
+        node.prev = self.head
+        node.next = self.head.next
+        self.head.next.prev = node
+        self.head.next = node
+    
+    def removeNode(self, node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def moveToHead(self, node):
+        self.removeNode(node)
+        self.addToHead(node)
+
+    def removeTail(self):
+        node = self.tail.prev
+        self.removeNode(node)
+        return node
+```
+
+行吧,不过不好看就是了
+
+
+
+#### [剑指 Offer II 032. 有效的变位词](https://leetcode.cn/problems/dKk3P7/)
+
+次数一致,不完全相等
+
+```python
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        return s != t and Counter(s) == Counter(t)
+```
+
+简单直接,字符串不相等且出现次数相等即可
+
+```python
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        if len(s)!=len(t):
+            return False
+        hashs=collections.defaultdict(int)
+        mark1=0
+        mark2=1
+        for i in range(len(s)):
+            if s[i]!=t[i]:
+                mark1=1
+            hashs[s[i]]+=1
+            hashs[t[i]]-=1
+        
+        for j in hashs:
+            if hashs[j]!=0:
+                mark2=0
+                break
+        return mark1==1 and mark2==1
+        
+```
+
+自己手写的远不如别人写的.如果只包含26个字母,完全可以只用26大小的数组记录即可
