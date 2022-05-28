@@ -9930,3 +9930,107 @@ class Solution:
 ```
 
 自己手写的远不如别人写的.如果只包含26个字母,完全可以只用26大小的数组记录即可
+
+
+
+
+
+#### [剑指 Offer II 033. 变位词组](https://leetcode.cn/problems/sfvd7V/) [49. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/) Counter()和sorted()方法没用好
+
+```python
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        mp=collections.defaultdict(list)
+
+        for st in strs:
+            key=''.join(sorted(st))	#用排序后的字符串作为哈希表的键，值则是单词本身
+            mp[key].append(st)
+        return list(mp.values())#从字典变成list
+```
+
+换个方法，用哈希表做也一样，省下了sorted排序的部分
+
+```python
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        mp=collections.defaultdict(list)
+        for i in strs:
+            counts=[0]*26
+            for ch in i:
+                counts[ord(ch)-ord('a')]+=1
+            mp[tuple(counts)].append(i)
+        return list(mp.values())
+```
+
+
+
+#### [50. Pow(x, n)](https://leetcode.cn/problems/powx-n/)
+
+利用二进制&方法得到是否应该令结果乘上当前的x,巧妙地技巧
+
+```python
+class Solution:
+    def myPow(self, x: float, n: int) -> float:
+        if x == 0.0: return 0.0
+        res=1
+        q=abs(n)
+        while q:
+            if q&1:
+                res*=x
+            x*=x
+            q>>=1
+        if n<0:
+            return 1/res
+        return res
+
+```
+
+#### [剑指 Offer II 034. 外星语言是否排序](https://leetcode.cn/problems/lwyVBB/)  [953. 验证外星语词典](https://leetcode.cn/problems/verifying-an-alien-dictionary/) 不会，字典序
+
+
+
+```python
+class Solution:
+    def isAlienSorted(self, words: List[str], order: str) -> bool:
+        index = {c: i for i, c in enumerate(order)}
+        return all(s <= t for s, t in pairwise([index[c] for c in word] for word in words))
+```
+
+
+
+#### [剑指 Offer II 035. 最小时间差 ](https://leetcode.cn/problems/569nqc/) [539. 最小时间差](https://leetcode.cn/problems/minimum-time-difference/)
+
+方法一：排序
+将 timePoints 排序后，最小时间差必然出现在 timePoints 的两个相邻时间，或者timePoints 的两个首尾时间中。因此排序后遍历一遍 timePoints 即可得到最小时间差。
+
+```python
+def getMinutes(t: str) -> int:
+    return ((ord(t[0]) - ord('0')) * 10 + ord(t[1]) - ord('0')) * 60 + (ord(t[3]) - ord('0')) * 10 + ord(t[4]) - ord('0') #全部转化为分钟数
+
+class Solution:
+    def findMinDifference(self, timePoints: List[str]) -> int:
+        if len(timePoints) > 1440:
+            return 0     #小优化,超过60*24肯定有两个数相等,节省时间
+        timePoints.sort()
+        ans = float('inf')
+        t0Minutes = getMinutes(timePoints[0])
+        preMinutes = t0Minutes
+        for i in range(1, len(timePoints)):
+            minutes = getMinutes(timePoints[i])
+            ans = min(ans, minutes - preMinutes)  # 相邻时间的时间差
+            preMinutes = minutes
+        ans = min(ans, t0Minutes + 1440 - preMinutes)  # 首尾时间的时间差
+        return ans
+```
+
+时间O(nlog(n)) 排序用的时间
+
+空间O(n)
+
+##### 方法二：
+
+```
+if len(timePoints) > 1440:
+            return 0
+```
+
